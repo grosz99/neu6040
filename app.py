@@ -66,9 +66,12 @@ h1, h2, h3 { font-family: 'Lato', sans-serif !important; color: #D31B2C !importa
 [data-testid="stSidebar"] .stMultiSelect label { color: #E6D8D3 !important; }
 
 /* Metrics */
-[data-testid="stMetric"] { background-color: #FFF5F5 !important; border-left: 4px solid #D31B2C; padding: 12px 16px; border-radius: 4px; }
+[data-testid="stMetric"] { background-color: #FFFFFF !important; border-left: 4px solid #D31B2C; padding: 12px 16px; border-radius: 4px; }
 [data-testid="stMetric"] [data-testid="stMetricValue"] { color: #D31B2C !important; font-weight: 700 !important; }
-[data-testid="stMetric"] [data-testid="stMetricLabel"] { color: #333333 !important; }
+[data-testid="stMetric"] [data-testid="stMetricLabel"],
+[data-testid="stMetric"] [data-testid="stMetricLabel"] * { color: #333333 !important; }
+[data-testid="stMetric"] [data-testid="stMetricDelta"],
+[data-testid="stMetric"] [data-testid="stMetricDelta"] * { color: #555555 !important; }
 
 /* Tabs & buttons */
 .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] { color: #D31B2C !important; border-bottom-color: #D31B2C !important; }
@@ -79,8 +82,29 @@ h1, h2, h3 { font-family: 'Lato', sans-serif !important; color: #D31B2C !importa
 /* Inputs & widgets in main area */
 [data-testid="stAppViewContainer"] input,
 [data-testid="stAppViewContainer"] textarea,
-[data-testid="stAppViewContainer"] select,
-[data-testid="stAppViewContainer"] [data-baseweb="select"] { background-color: #FFFFFF !important; color: #333333 !important; }
+[data-testid="stAppViewContainer"] select { background-color: #FFFFFF !important; color: #333333 !important; }
+[data-testid="stAppViewContainer"] [data-baseweb="select"],
+[data-testid="stAppViewContainer"] [data-baseweb="select"] *,
+[data-testid="stAppViewContainer"] [data-baseweb="select"] div,
+[data-testid="stAppViewContainer"] [data-baseweb="select"] span,
+[data-testid="stAppViewContainer"] [data-baseweb="input"],
+[data-testid="stAppViewContainer"] [data-baseweb="input"] * { background-color: #FFFFFF !important; color: #333333 !important; }
+[data-testid="stAppViewContainer"] [data-baseweb="popover"],
+[data-testid="stAppViewContainer"] [data-baseweb="popover"] *,
+[data-testid="stAppViewContainer"] [role="listbox"],
+[data-testid="stAppViewContainer"] [role="listbox"] *,
+[data-testid="stAppViewContainer"] [role="option"],
+[data-testid="stAppViewContainer"] [role="option"] * { background-color: #FFFFFF !important; color: #333333 !important; }
+[data-testid="stAppViewContainer"] [role="option"]:hover { background-color: #FFF5F5 !important; }
+
+/* Radio buttons & checkboxes in main area */
+[data-testid="stAppViewContainer"] [role="radiogroup"] label,
+[data-testid="stAppViewContainer"] [role="radiogroup"] span,
+[data-testid="stAppViewContainer"] .stRadio label,
+[data-testid="stAppViewContainer"] .stCheckbox label { color: #333333 !important; }
+
+/* Text areas */
+[data-testid="stAppViewContainer"] .stTextArea textarea { background-color: #FFFFFF !important; color: #333333 !important; border: 1px solid #ccc !important; }
 
 /* Expanders */
 [data-testid="stExpander"] { background-color: #FFFFFF !important; }
