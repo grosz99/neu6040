@@ -38,19 +38,54 @@ st.set_page_config(
 NEU_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
-html, body, [class*="css"] { font-family: 'Lato', sans-serif; }
+
+/* Force light mode on main content */
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewContainer"] > *,
+.main, .main > *,
+[data-testid="stMainBlockContainer"],
+section[data-testid="stMain"] {
+    background-color: #FFFFFF !important;
+    color: #333333 !important;
+}
+html, body, [class*="css"] { font-family: 'Lato', sans-serif; color: #333333 !important; }
+p, span, li, td, th, label, div { color: #333333 !important; }
 h1, h2, h3 { font-family: 'Lato', sans-serif !important; color: #D31B2C !important; font-weight: 700 !important; }
+
+/* Dark sidebar */
 [data-testid="stSidebar"] { background-color: #1A1A1A !important; }
-[data-testid="stSidebar"] * { color: #FFFFFF !important; }
+[data-testid="stSidebar"] *,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div { color: #FFFFFF !important; }
+[data-testid="stSidebar"] img { background: white; border-radius: 50%; padding: 4px; }
 [data-testid="stSidebar"] .stSelectbox label,
 [data-testid="stSidebar"] .stSlider label,
 [data-testid="stSidebar"] .stRadio label,
 [data-testid="stSidebar"] .stMultiSelect label { color: #E6D8D3 !important; }
-[data-testid="stMetric"] { background-color: #FFF5F5; border-left: 4px solid #D31B2C; padding: 12px 16px; border-radius: 4px; }
+
+/* Metrics */
+[data-testid="stMetric"] { background-color: #FFF5F5 !important; border-left: 4px solid #D31B2C; padding: 12px 16px; border-radius: 4px; }
 [data-testid="stMetric"] [data-testid="stMetricValue"] { color: #D31B2C !important; font-weight: 700 !important; }
+[data-testid="stMetric"] [data-testid="stMetricLabel"] { color: #333333 !important; }
+
+/* Tabs & buttons */
 .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] { color: #D31B2C !important; border-bottom-color: #D31B2C !important; }
+.stTabs [data-baseweb="tab-list"] button { color: #333333 !important; }
 .stButton > button { background-color: #D31B2C !important; color: white !important; border: none !important; font-weight: 700 !important; border-radius: 4px !important; }
 .stButton > button:hover { background-color: #B01624 !important; }
+
+/* Inputs & widgets in main area */
+[data-testid="stAppViewContainer"] input,
+[data-testid="stAppViewContainer"] textarea,
+[data-testid="stAppViewContainer"] select,
+[data-testid="stAppViewContainer"] [data-baseweb="select"] { background-color: #FFFFFF !important; color: #333333 !important; }
+
+/* Expanders */
+[data-testid="stExpander"] { background-color: #FFFFFF !important; }
+[data-testid="stExpander"] summary span { color: #333333 !important; }
+
 hr { border-color: #D31B2C !important; }
 </style>
 """
