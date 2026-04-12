@@ -714,105 +714,346 @@ def week1_cleaning_lab():
 # ╚══════════════════════════════════════════════════════════════╝
 
 def week2_business_insights():
-    banner("Week 2: Business Insights & KPIs",
-           "Discover patterns through correlation and regression")
+    banner("Week 2: Dashboards & Metrics That Matter",
+           "Learn what makes a great dashboard and how to choose the right KPIs")
 
     data = generate_retail_data()
-    tab1, tab2, tab3 = st.tabs(["📊 KPI Dashboard", "🔗 Correlation Analysis", "📈 Regression Explorer"])
+    tab1, tab2, tab3 = st.tabs(["Dashboard Design", "Finding the Right Metrics",
+                                 "Build Your Dashboard"])
 
-    # --- KPI Dashboard ---
+    # ── Tab 1: Dashboard Design Principles ──
     with tab1:
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Total Revenue", f"${data['revenue'].sum():,.0f}")
-        c2.metric("Avg Satisfaction", f"{data['customer_satisfaction'].mean():.2f} / 5")
-        c3.metric("Repeat Rate", f"{data['repeat_customer'].mean()*100:.1f}%")
-        top_cat = data.groupby("product_category")["revenue"].sum().idxmax()
-        c4.metric("Top Category", top_cat)
+        st.markdown("### What separates a great dashboard from a bad one?")
+        info_box("A dashboard is not a chart dump. It is a <b>decision-support tool</b>. "
+                 "Every element should answer a question someone actually has.")
 
-        left, right = st.columns(2)
-        for col_block, group_col, title in [
-            (left, "region", "Revenue by Region"),
-            (right, "product_category", "Revenue by Category"),
-        ]:
-            with col_block:
-                agg = data.groupby(group_col)["revenue"].sum().sort_values(ascending=False)
+        st.markdown("#### The 5 Principles of Effective Dashboards")
+        principles = {
+            "1. Answer a specific question": (
+                "Every chart must answer a clear question. 'Revenue by Region' answers "
+                "'Where are we strongest?' A chart with no question is decoration."
+            ),
+            "2. Visual hierarchy — most important first": (
+                "The eye reads top-left to bottom-right. Put the most critical KPIs at the "
+                "top. Details and drill-downs go below."
+            ),
+            "3. Right chart for the right data": (
+                "Bar charts for comparison. Line charts for trends over time. Scatter for "
+                "relationships. Pie charts almost never — humans are bad at comparing angles."
+            ),
+            "4. Data-ink ratio — remove the noise": (
+                "Every pixel should communicate data. Remove gridlines, borders, 3D effects, "
+                "and redundant labels. Less ink = more clarity."
+            ),
+            "5. Actionable, not decorative": (
+                "If a metric goes up or down, does someone do something differently? "
+                "If not, it doesn't belong on the dashboard."
+            ),
+        }
+        for title, desc in principles.items():
+            with st.expander(title):
+                st.markdown(desc)
+
+        # Live comparison: cluttered vs clean
+        st.markdown("---")
+        st.markdown("#### See It In Action: Cluttered vs Clean")
+        view = st.radio("Which version?", ["Cluttered", "Clean"], horizontal=True, key="w2_compare")
+
+        if view == "Cluttered":
+            # Cluttered: too many charts, bad types, no hierarchy
+            c1, c2, c3, c4, c5 = st.columns(5)
+            c1.metric("Rows", len(data))
+            c2.metric("Columns", len(data.columns))
+            c3.metric("Avg Price", f"${data['unit_price'].mean():.2f}")
+            c4.metric("Max Units", int(data['units_sold'].max()))
+            c5.metric("Min Discount", f"{data['discount_pct'].min():.4f}")
+
+            fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+            fig.patch.set_facecolor("white")
+            # Bad: pie chart for too many values
+            vc = data["customer_id"].value_counts().head(8)
+            axes[0].pie(vc.values, labels=vc.index, autopct="%1.1f%%", textprops={"fontsize": 6})
+            axes[0].set_title("Revenue by Customer ID (??)", fontsize=9)
+            # Bad: 3D-style bar with too many colors
+            cats = data["product_category"].value_counts()
+            axes[1].bar(cats.index, cats.values, color=["red","blue","green","orange"],
+                        edgecolor="black", linewidth=2)
+            axes[1].set_title("COUNT of Rows by Category", fontsize=9)
+            axes[1].set_ylabel("Count of Rows")
+            for spine in axes[1].spines.values():
+                spine.set_linewidth(3)
+            # Bad: scatter with no labels
+            axes[2].scatter(range(len(data)), data["unit_price"], s=3, c="purple")
+            axes[2].set_title("Data Plot", fontsize=9)
+            plt.tight_layout(); st.pyplot(fig)
+
+            st.error("**Problems:** Vanity metrics (row count, min discount). Pie chart with IDs. "
+                     "Count of rows tells us nothing. 'Data Plot' has no axis labels or purpose. "
+                     "No questions are being answered.")
+
+        else:
+            # Clean: clear hierarchy, right chart types, actionable
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("Total Revenue", f"${data['revenue'].sum():,.0f}")
+            c2.metric("Avg Satisfaction", f"{data['customer_satisfaction'].mean():.2f} / 5")
+            c3.metric("Repeat Rate", f"{data['repeat_customer'].mean()*100:.1f}%")
+            top_cat = data.groupby("product_category")["revenue"].sum().idxmax()
+            c4.metric("Top Category", top_cat)
+
+            left, right = st.columns(2)
+            with left:
+                agg = data.groupby("region")["revenue"].sum().sort_values(ascending=False)
                 fig, ax = plt.subplots(figsize=(7, 4))
                 fig.patch.set_facecolor("white")
                 ax.bar(agg.index, agg.values, color=NEU_PALETTE[:len(agg)], edgecolor="black")
-                ax.set_title(title, fontweight="bold")
+                ax.set_title("Where are we strongest?", fontweight="bold")
                 ax.set_ylabel("Revenue ($)")
                 for i, v in enumerate(agg.values):
-                    ax.text(i, v, f"${v:,.0f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
+                    ax.text(i, v, f"${v:,.0f}", ha="center", va="bottom", fontsize=8,
+                            fontweight="bold")
                 ax.grid(axis="y", alpha=.3)
-                plt.tight_layout()
-                st.pyplot(fig)
+                plt.tight_layout(); st.pyplot(fig)
+            with right:
+                cat_agg = data.groupby("product_category").agg(
+                    rev=("revenue","sum"), sat=("customer_satisfaction","mean")
+                ).sort_values("rev", ascending=True)
+                fig, ax = plt.subplots(figsize=(7, 4))
+                fig.patch.set_facecolor("white")
+                ax.barh(cat_agg.index, cat_agg["rev"], color=NEU_PALETTE[:len(cat_agg)])
+                ax.set_title("Which categories drive revenue?", fontweight="bold")
+                ax.set_xlabel("Revenue ($)")
+                plt.tight_layout(); st.pyplot(fig)
 
-    # --- Correlation Analysis ---
+            st.success("**Why this works:** Every metric is actionable. Chart titles are questions. "
+                       "Visual hierarchy puts the top-line KPIs first. Bar charts — not pies — for "
+                       "comparison. Clean grid, minimal ink.")
+
+    # ── Tab 2: Finding the Right Metrics ──
     with tab2:
-        num_cols = data.select_dtypes(include=[np.number]).columns.tolist()
-        selected = st.multiselect("Columns to include", num_cols, default=num_cols, key="w2_corr")
-        if len(selected) > 1:
-            corr = data[selected].corr()
-            fig, ax = plt.subplots(figsize=(9, 7))
+        st.markdown("### Vanity Metrics vs Actionable Metrics")
+        info_box(
+            "A <b>vanity metric</b> looks impressive but doesn't drive decisions. "
+            "An <b>actionable metric</b> tells you what to do next. The difference is: "
+            "<i>if this number changes, does someone act differently?</i>"
+        )
+
+        st.markdown("#### Scenario: You're the Head of Retail Analytics")
+        st.markdown(
+            "The CEO asks: *'How is the business doing?'* You have these metrics available. "
+            "**Select the ones that belong on the executive dashboard.**"
+        )
+
+        all_metrics = {
+            "Total Revenue": {"actionable": True,
+                "why": "Directly measures business performance. A drop triggers investigation."},
+            "Number of Rows in Database": {"actionable": False,
+                "why": "Technical metric — tells you nothing about business health."},
+            "Repeat Customer Rate": {"actionable": True,
+                "why": "Measures loyalty. A drop signals retention problems and triggers action."},
+            "Average Unit Price": {"actionable": False,
+                "why": "Descriptive but not decision-driving. Price is an input, not an outcome."},
+            "Revenue per Customer": {"actionable": True,
+                "why": "Measures customer value. Declining ARPU triggers upsell strategies."},
+            "Max Units Sold (single order)": {"actionable": False,
+                "why": "An outlier stat. One big order doesn't reflect the business."},
+            "Customer Satisfaction Score": {"actionable": True,
+                "why": "Leading indicator of churn. A drop below threshold triggers service review."},
+            "Total Discount Given ($)": {"actionable": True,
+                "why": "Measures margin erosion. Rising discounts signal pricing pressure."},
+            "Count of Product Categories": {"actionable": False,
+                "why": "Structural fact, not a performance indicator. It rarely changes."},
+            "Marketing ROI (Revenue / Spend)": {"actionable": True,
+                "why": "Directly drives budget allocation decisions."},
+        }
+
+        selected_metrics = []
+        cols = st.columns(2)
+        for i, (name, info) in enumerate(all_metrics.items()):
+            col = cols[i % 2]
+            if col.checkbox(name, key=f"w2_m_{i}"):
+                selected_metrics.append(name)
+
+        if st.button("Check My Selections", key="w2_check"):
+            correct = [m for m in selected_metrics if all_metrics[m]["actionable"]]
+            wrong = [m for m in selected_metrics if not all_metrics[m]["actionable"]]
+            missed = [m for m, info in all_metrics.items()
+                      if info["actionable"] and m not in selected_metrics]
+
+            if correct:
+                st.success(f"**Good picks:** {', '.join(correct)}")
+            if wrong:
+                st.error(f"**Vanity metrics — remove these:** {', '.join(wrong)}")
+            if missed:
+                st.warning(f"**You missed:** {', '.join(missed)}")
+
+            st.markdown("---")
+            st.markdown("#### Why each metric is or isn't actionable")
+            for name, info in all_metrics.items():
+                icon = "+" if info["actionable"] else "-"
+                st.markdown(f"**{icon} {name}** — {info['why']}")
+
+        # Show how metric choice changes the story
+        st.markdown("---")
+        st.markdown("### Same Data, Different Story")
+        story = st.radio("Which story do you want to tell?",
+                         ["We're growing", "We have a problem"],
+                         horizontal=True, key="w2_story")
+
+        if story == "We're growing":
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Total Revenue", f"${data['revenue'].sum():,.0f}")
+            c2.metric("Total Orders", f"{len(data):,}")
+            top_rev = data.groupby("region")["revenue"].sum().max()
+            c3.metric("Best Region Revenue", f"${top_rev:,.0f}")
+
+            fig, ax = plt.subplots(figsize=(10, 4))
             fig.patch.set_facecolor("white")
-            sns.heatmap(corr, annot=True, fmt=".2f", cmap="RdBu_r", center=0,
-                        vmin=-1, vmax=1, ax=ax)
-            ax.set_title("Correlation Heatmap", fontweight="bold")
-            plt.tight_layout()
-            st.pyplot(fig)
-
-            strong = []
-            for i in range(len(corr)):
-                for j in range(i+1, len(corr)):
-                    r = corr.iloc[i, j]
-                    if abs(r) > .5:
-                        strong.append({"Var 1": corr.columns[i], "Var 2": corr.columns[j],
-                                       "r": f"{r:.3f}"})
-            if strong:
-                st.markdown("#### Strong correlations (|r| > 0.5)")
-                st.dataframe(pd.DataFrame(strong), use_container_width=True)
-            else:
-                st.info("No pairs with |r| > 0.5 in selected columns.")
-
-    # --- Regression Explorer ---
-    with tab3:
-        num_cols = data.select_dtypes(include=[np.number]).columns.tolist()
-        lc, rc = st.columns(2)
-        x_var = lc.selectbox("X (predictor)", num_cols, key="w2_x")
-        y_var = rc.selectbox("Y (response)", num_cols, index=min(1, len(num_cols)-1), key="w2_y")
-
-        if x_var != y_var:
-            x, y = data[x_var].values, data[y_var].values
-            slope, intercept, r, p, se = scipy.stats.linregress(x, y)
-            r2 = r**2
-
-            fig, ax = plt.subplots(figsize=(9, 5))
-            fig.patch.set_facecolor("white")
-            ax.scatter(x, y, color="#0ECCDE", alpha=.5, s=30, edgecolor="black", linewidth=.3)
-            xl = np.array([x.min(), x.max()])
-            ax.plot(xl, intercept + slope*xl, color="#D31B2C", linewidth=3,
-                    label=f"OLS (R²={r2:.3f})")
-            ax.set_xlabel(x_var, fontweight="bold")
-            ax.set_ylabel(y_var, fontweight="bold")
-            ax.set_title(f"{y_var} vs {x_var}", fontweight="bold")
-            ax.legend()
-            ax.grid(alpha=.3)
-            plt.tight_layout()
-            st.pyplot(fig)
-
-            m1, m2, m3 = st.columns(3)
-            m1.metric("R²", f"{r2:.4f}")
-            m2.metric("Slope", f"{slope:.4f}")
-            m3.metric("p-value", f"{p:.2e}")
-
-            if p < .05:
-                info_box(f"<b>Statistically significant</b> (p = {p:.2e}). Each unit increase in "
-                         f"{x_var} is associated with a {slope:.4f} change in {y_var}.")
-            else:
-                info_box(f"<b>Not significant</b> (p = {p:.2e}). We can't confidently say "
-                         f"{x_var} predicts {y_var}.")
+            agg = data.groupby("product_category")["revenue"].sum().sort_values()
+            ax.barh(agg.index, agg.values, color="#0ECCDE", edgecolor="black")
+            ax.set_title("All Categories Generating Revenue", fontweight="bold")
+            ax.set_xlabel("Revenue ($)"); plt.tight_layout(); st.pyplot(fig)
+            info_box("Cherry-picked positive metrics. No benchmarks. No trends. Looks great "
+                     "but hides problems.")
         else:
-            st.warning("Pick different variables for X and Y.")
+            c1, c2, c3 = st.columns(3)
+            avg_disc = data["discount_pct"].mean() * 100
+            low_sat = (data["customer_satisfaction"] < 2.5).mean() * 100
+            non_repeat = (1 - data["repeat_customer"].mean()) * 100
+            c1.metric("Avg Discount", f"{avg_disc:.1f}%", delta="-margin pressure")
+            c2.metric("Low Satisfaction", f"{low_sat:.1f}%", delta="below 2.5/5")
+            c3.metric("One-Time Buyers", f"{non_repeat:.1f}%", delta="not returning")
+
+            fig, ax = plt.subplots(figsize=(10, 4))
+            fig.patch.set_facecolor("white")
+            by_region = data.groupby("region").agg(
+                rev=("revenue","sum"), spend=("marketing_spend","sum"))
+            by_region["roi"] = by_region["rev"] / by_region["spend"]
+            ax.bar(by_region.index, by_region["roi"], color="#D31B2C", edgecolor="black")
+            ax.set_title("Marketing ROI by Region — Are We Spending Wisely?", fontweight="bold")
+            ax.set_ylabel("Revenue per $ Spent"); ax.axhline(y=1, color="black", ls="--", lw=1)
+            plt.tight_layout(); st.pyplot(fig)
+            info_box("Same dataset — completely different narrative. The metrics you <b>choose</b> "
+                     "determine the story. A great dashboard shows <b>both</b> sides honestly.")
+
+    # ── Tab 3: Build Your Dashboard ──
+    with tab3:
+        st.markdown("### Design Your Executive Dashboard")
+        st.markdown("Select **3-5 metrics** and **2 charts** that belong on a CEO dashboard "
+                    "for this retail business. Then score yourself.")
+
+        st.markdown("#### Pick Your KPIs")
+        kpi_options = {
+            "Total Revenue": f"${data['revenue'].sum():,.0f}",
+            "Repeat Customer Rate": f"{data['repeat_customer'].mean()*100:.1f}%",
+            "Avg Satisfaction": f"{data['customer_satisfaction'].mean():.2f} / 5",
+            "Marketing ROI": f"{data['revenue'].sum()/data['marketing_spend'].sum():.2f}x",
+            "Avg Discount": f"{data['discount_pct'].mean()*100:.1f}%",
+            "Revenue per Customer": f"${data['revenue'].mean():,.0f}",
+            "Total Orders": f"{len(data):,}",
+            "Total Customers": f"{data['customer_id'].nunique():,}",
+        }
+        chosen_kpis = st.multiselect("Select 3-5 KPIs for the top row",
+                                      list(kpi_options.keys()), key="w2_kpis")
+
+        st.markdown("#### Pick Your Charts")
+        chart_options = [
+            "Revenue by Region (bar)",
+            "Revenue by Category (bar)",
+            "Satisfaction Distribution (histogram)",
+            "Marketing Spend vs Revenue (scatter)",
+            "Repeat vs One-Time by Region (stacked bar)",
+            "Discount vs Satisfaction (scatter)",
+        ]
+        chosen_charts = st.multiselect("Select 2 charts", chart_options,
+                                        max_selections=2, key="w2_charts")
+
+        if chosen_kpis and chosen_charts and st.button("Build My Dashboard", key="w2_build"):
+            st.markdown("---")
+            st.markdown("### Your Dashboard")
+
+            # Render selected KPIs
+            kpi_cols = st.columns(min(len(chosen_kpis), 5))
+            for i, kpi in enumerate(chosen_kpis[:5]):
+                kpi_cols[i % len(kpi_cols)].metric(kpi, kpi_options[kpi])
+
+            # Render selected charts
+            chart_cols = st.columns(min(len(chosen_charts), 2))
+            for i, chart in enumerate(chosen_charts[:2]):
+                with chart_cols[i]:
+                    fig, ax = plt.subplots(figsize=(7, 4))
+                    fig.patch.set_facecolor("white")
+                    if chart == "Revenue by Region (bar)":
+                        agg = data.groupby("region")["revenue"].sum().sort_values(ascending=False)
+                        ax.bar(agg.index, agg.values, color=NEU_PALETTE[:len(agg)], edgecolor="black")
+                        ax.set_title("Revenue by Region", fontweight="bold")
+                        ax.set_ylabel("Revenue ($)")
+                    elif chart == "Revenue by Category (bar)":
+                        agg = data.groupby("product_category")["revenue"].sum().sort_values()
+                        ax.barh(agg.index, agg.values, color=NEU_PALETTE[:len(agg)])
+                        ax.set_title("Revenue by Category", fontweight="bold")
+                        ax.set_xlabel("Revenue ($)")
+                    elif chart == "Satisfaction Distribution (histogram)":
+                        ax.hist(data["customer_satisfaction"], bins=20, color="#0ECCDE",
+                                edgecolor="black", alpha=.7)
+                        ax.set_title("Customer Satisfaction Distribution", fontweight="bold")
+                        ax.set_xlabel("Rating"); ax.set_ylabel("Count")
+                    elif chart == "Marketing Spend vs Revenue (scatter)":
+                        ax.scatter(data["marketing_spend"], data["revenue"], alpha=.4,
+                                   color="#D31B2C", s=20, edgecolor="black", linewidth=.3)
+                        ax.set_title("Marketing Spend vs Revenue", fontweight="bold")
+                        ax.set_xlabel("Marketing Spend ($)"); ax.set_ylabel("Revenue ($)")
+                    elif chart == "Repeat vs One-Time by Region (stacked bar)":
+                        ct = pd.crosstab(data["region"], data["repeat_customer"])
+                        ct.columns = ["One-Time","Repeat"]
+                        ct.plot.bar(stacked=True, ax=ax, color=["#8C8080","#0ECCDE"],
+                                    edgecolor="black")
+                        ax.set_title("Customer Retention by Region", fontweight="bold")
+                        ax.set_ylabel("Customers"); ax.legend()
+                    elif chart == "Discount vs Satisfaction (scatter)":
+                        ax.scatter(data["discount_pct"]*100, data["customer_satisfaction"],
+                                   alpha=.4, color="#0C3354", s=20, edgecolor="black", linewidth=.3)
+                        ax.set_title("Does Discounting Hurt Satisfaction?", fontweight="bold")
+                        ax.set_xlabel("Discount (%)"); ax.set_ylabel("Satisfaction")
+                    ax.grid(axis="y", alpha=.3)
+                    plt.tight_layout(); st.pyplot(fig)
+
+            # Scorecard
+            st.markdown("---")
+            st.markdown("### Dashboard Scorecard")
+            score = 0
+            feedback = []
+            actionable_kpis = {"Total Revenue", "Repeat Customer Rate", "Avg Satisfaction",
+                               "Marketing ROI", "Revenue per Customer", "Avg Discount"}
+            vanity_kpis = {"Total Orders", "Total Customers"}
+
+            good_picks = [k for k in chosen_kpis if k in actionable_kpis]
+            bad_picks = [k for k in chosen_kpis if k in vanity_kpis]
+
+            if 3 <= len(chosen_kpis) <= 5:
+                score += 1; feedback.append("+ Good: 3-5 KPIs is the right range.")
+            else:
+                feedback.append("- Too few or too many KPIs. Aim for 3-5.")
+
+            if len(good_picks) >= 3:
+                score += 2; feedback.append(f"+ Strong: {len(good_picks)} actionable metrics selected.")
+            else:
+                feedback.append("- Try to include more actionable metrics (Revenue, ROI, Satisfaction).")
+
+            if not bad_picks:
+                score += 1; feedback.append("+ Clean: No vanity metrics on the dashboard.")
+            else:
+                feedback.append(f"- Reconsider: {', '.join(bad_picks)} — these don't drive decisions.")
+
+            if len(chosen_charts) == 2:
+                score += 1; feedback.append("+ Good: 2 charts keeps it focused.")
+
+            grade = {5: "A", 4: "B+", 3: "B", 2: "C", 1: "D"}.get(score, "F")
+            st.metric("Dashboard Grade", grade, delta=f"{score}/5 points")
+            for f in feedback:
+                if f.startswith("+"):
+                    st.success(f)
+                else:
+                    st.warning(f)
 
 
 # ╔══════════════════════════════════════════════════════════════╗
