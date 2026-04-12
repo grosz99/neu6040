@@ -120,8 +120,17 @@ h1, h2, h3 { font-family: 'Lato', sans-serif !important; color: #D31B2C !importa
 [data-testid="stAppViewContainer"] .stTextArea textarea { background-color: #FFFFFF !important; color: #333333 !important; border: 1px solid #ccc !important; }
 
 /* Expanders */
-[data-testid="stExpander"] { background-color: #FFFFFF !important; }
-[data-testid="stExpander"] summary span { color: #333333 !important; }
+[data-testid="stExpander"] { background-color: #FFFFFF !important; border: 1px solid #E0E0E0 !important; border-radius: 6px !important; }
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary *,
+[data-testid="stExpander"] summary span,
+[data-testid="stExpander"] summary p,
+[data-testid="stExpander"] [data-testid="stExpanderToggleIcon"] { color: #333333 !important; background-color: #F8F8F8 !important; }
+[data-testid="stExpander"] details,
+[data-testid="stExpander"] details > div { background-color: #FFFFFF !important; }
+[data-testid="stExpander"] details > div *,
+[data-testid="stExpander"] details > div p,
+[data-testid="stExpander"] details > div span { color: #333333 !important; }
 
 hr { border-color: #D31B2C !important; }
 </style>
