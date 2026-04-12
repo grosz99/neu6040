@@ -64,6 +64,19 @@ h1, h2, h3 { font-family: 'Lato', sans-serif !important; color: #D31B2C !importa
 [data-testid="stSidebar"] .stSlider label,
 [data-testid="stSidebar"] .stRadio label,
 [data-testid="stSidebar"] .stMultiSelect label { color: #E6D8D3 !important; }
+[data-testid="stSidebar"] [data-baseweb="select"],
+[data-testid="stSidebar"] [data-baseweb="select"] *,
+[data-testid="stSidebar"] [data-baseweb="select"] div,
+[data-testid="stSidebar"] [data-baseweb="select"] span,
+[data-testid="stSidebar"] [data-baseweb="input"],
+[data-testid="stSidebar"] [data-baseweb="input"] * { background-color: #333333 !important; color: #FFFFFF !important; }
+[data-testid="stSidebar"] [data-baseweb="popover"],
+[data-testid="stSidebar"] [data-baseweb="popover"] *,
+[data-testid="stSidebar"] [role="listbox"],
+[data-testid="stSidebar"] [role="listbox"] *,
+[data-testid="stSidebar"] [role="option"],
+[data-testid="stSidebar"] [role="option"] * { background-color: #333333 !important; color: #FFFFFF !important; }
+[data-testid="stSidebar"] [role="option"]:hover { background-color: #555555 !important; }
 
 /* Metrics */
 [data-testid="stMetric"] { background-color: #FFFFFF !important; border-left: 4px solid #D31B2C; padding: 12px 16px; border-radius: 4px; }
