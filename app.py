@@ -110,6 +110,20 @@ h1, h2, h3 { font-family: 'Lato', sans-serif !important; color: #D31B2C !importa
 [data-testid="stAppViewContainer"] [role="option"] * { background-color: #FFFFFF !important; color: #333333 !important; }
 [data-testid="stAppViewContainer"] [role="option"]:hover { background-color: #FFF5F5 !important; }
 
+/* Global dropdown/popover overrides — these render as portals outside the main container */
+[data-baseweb="popover"],
+[data-baseweb="popover"] *,
+[data-baseweb="menu"],
+[data-baseweb="menu"] *,
+[data-baseweb="list"],
+[data-baseweb="list"] *,
+[role="listbox"],
+[role="listbox"] *,
+[role="option"],
+[role="option"] * { background-color: #FFFFFF !important; color: #333333 !important; }
+[role="option"]:hover,
+[data-baseweb="menu"] li:hover { background-color: #F0F0F0 !important; }
+
 /* Radio buttons & checkboxes in main area */
 [data-testid="stAppViewContainer"] [role="radiogroup"] label,
 [data-testid="stAppViewContainer"] [role="radiogroup"] span,
